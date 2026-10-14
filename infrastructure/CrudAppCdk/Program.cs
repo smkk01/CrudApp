@@ -142,6 +142,28 @@ public sealed class CrudAppStack : Stack
                 MetricsEnabled = true
             }
         });
+        var gatewayCorsHeaders = new Dictionary<string, string>
+        {
+            ["Access-Control-Allow-Origin"] = $"'{frontendOrigin}'",
+            ["Access-Control-Allow-Headers"] = "'Authorization,Content-Type'",
+            ["Access-Control-Allow-Methods"] = "'GET,POST,PUT,DELETE,OPTIONS'",
+            ["Vary"] = "'Origin'"
+        };
+        foreach (var (responseId, responseType) in new[]
+        {
+            ("Unauthorized", ResponseType_.UNAUTHORIZED),
+            ("AccessDenied", ResponseType_.ACCESS_DENIED),
+            ("Default4xx", ResponseType_.DEFAULT_4XX),
+            ("Default5xx", ResponseType_.DEFAULT_5XX)
+        })
+        {
+            api.AddGatewayResponse($"Cors{responseId}", new GatewayResponseOptions
+            {
+                Type = responseType,
+                ResponseHeaders = gatewayCorsHeaders
+            });
+        }
+
         var integration = new LambdaIntegration(lambdaFunction);
         api.Root.AddResource("health").AddMethod("GET", integration);
 

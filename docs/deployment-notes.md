@@ -4,7 +4,7 @@
 
 AWS Amplify Hosting is configured through the repository's `amplify.yml` for the Vite frontend. Connect the GitHub `main` branch in Amplify Console, set the four `VITE_*` variables documented in the README, and configure an SPA rewrite to `/index.html`.
 
-After Amplify provides the branch domain, redeploy CDK with `FRONTEND_ORIGIN=https://main.<app-id>.amplifyapp.com` so API Gateway responses and preflight requests allow that exact origin.
+The `main` branch domain is `https://main.d31r4v0tw7ckk9.amplifyapp.com`. `FRONTEND_ORIGIN` is set to that origin by the deployment workflow; for manual deployment, set the same variable before running CDK. API Gateway's authorization and gateway error responses also include CORS headers so the browser can handle 401/403 errors.
 
 ## Backend hosting
 
