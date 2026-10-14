@@ -1,6 +1,16 @@
 # CrudOps Cloud
 
-A production-ready AWS React CRUD starter using React 19, Vite, Material UI, .NET 8 Minimal API, DynamoDB, API Gateway, Cognito, and AWS CDK.
+A React and .NET product CRUD app deployed on AWS with Amplify Hosting, API Gateway, Lambda, DynamoDB, and Cognito.
+
+## Live deployment
+
+- **Frontend:** [CrudOps Cloud](https://main.d31r4v0tw7ckk9.amplifyapp.com/)
+- **API base URL:** `https://58gn5kkv5i.execute-api.ap-southeast-1.amazonaws.com/prod/`
+- **Health check:** [API health](https://58gn5kkv5i.execute-api.ap-southeast-1.amazonaws.com/prod/health)
+- **AWS region:** `ap-southeast-1`
+- **Amplify app ID:** `d31r4v0tw7ckk9`
+
+The dashboard requires a Cognito account. Choose **Create an account**, verify the email using the code Cognito sends, and then sign in. Product endpoints require a valid Cognito token; `/health` is public. Product records are stored in DynamoDB.
 
 ## Project structure
 
@@ -47,39 +57,31 @@ npm run build --prefix frontend
 
 ## AWS deployment
 
-1. Publish the API:
+The backend and infrastructure are deployed to the AWS account described above. To update the stack manually from PowerShell at the repository root:
 
-```bash
-dotnet publish backend/CrudApi/CrudApi.csproj -c Release -o artifacts/CrudApi
-```
-
-2. Install CDK dependencies:
-
-```bash
+```powershell
+dotnet publish backend\CrudApi\CrudApi.csproj -c Release -o artifacts\CrudApi
 npm install -g aws-cdk
-```
+$env:FRONTEND_ORIGIN = "https://main.d31r4v0tw7ckk9.amplifyapp.com"
 
-3. Deploy the infrastructure:
-
-```bash
-cd infrastructure/CrudAppCdk
+Set-Location infrastructure\CrudAppCdk
 cdk deploy --app "dotnet run --project CrudAppCdk.csproj --configuration Release" --require-approval never
 ```
 
-When deploying the custom Lambda entry point for API Gateway, publish the backend first to `artifacts/CrudApi` and ensure the Lambda assembly includes the `Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer` attribute. This is required for `APIGatewayProxyRequest` deserialization on the AWS runtime.
+The backend must be published to `artifacts/CrudApi` before CDK deployment. The custom Lambda handler uses `Amazon.Lambda.Serialization.SystemTextJson.DefaultLambdaJsonSerializer` to deserialize API Gateway events.
 
-Alternatively, use GitHub Actions to automate the workflow.
+To deploy from GitHub Actions instead, configure `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` repository secrets, then manually run the **Deploy** workflow. The workflow publishes the backend and sets the deployed Amplify origin for CORS.
 
 ## AWS Amplify frontend hosting
 
-The repository includes an Amplify monorepo build spec in `amplify.yml` for the Vite frontend. In the Amplify Console, connect the GitHub repository `smkk01/CrudApp` and the `main` branch. Set these build environment variables from the CDK outputs:
+The frontend is hosted by Amplify from the `main` branch of [`smkk01/CrudApp`](https://github.com/smkk01/CrudApp). The repository includes an Amplify monorepo build spec in `amplify.yml`; Amplify builds automatically when changes are pushed to `main`. The deployed app uses:
 
-- `VITE_API_BASE_URL` — the `ApiGatewayUrl` output
-- `VITE_AWS_REGION` — the stack region
-- `VITE_COGNITO_USER_POOL_ID` — the `UserPoolId` output
-- `VITE_COGNITO_USER_POOL_CLIENT_ID` — the `UserPoolClientId` output
+- `VITE_API_BASE_URL` — API Gateway URL above
+- `VITE_AWS_REGION` — `ap-southeast-1`
+- `VITE_COGNITO_USER_POOL_ID` — `ap-southeast-1_Wb9ZOX4bF`
+- `VITE_COGNITO_USER_POOL_CLIENT_ID` — `1steojb3dpo8lh6rri5bgod3o4`
 
-After Amplify assigns the branch domain, set `FRONTEND_ORIGIN` to `https://main.<app-id>.amplifyapp.com` and redeploy the CDK stack so API CORS matches the hosted frontend. Add an Amplify rewrite rule from `/<*>` to `/index.html` with status `200` for client-side routing.
+The Amplify SPA rewrite from `/<*>` to `/index.html` is configured. The CDK stack restricts API CORS to `https://main.d31r4v0tw7ckk9.amplifyapp.com`, including API Gateway authorization-error responses.
 
 ## Notes
 
