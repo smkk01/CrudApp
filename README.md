@@ -70,6 +70,17 @@ When deploying the custom Lambda entry point for API Gateway, publish the backen
 
 Alternatively, use GitHub Actions to automate the workflow.
 
+## AWS Amplify frontend hosting
+
+The repository includes an Amplify monorepo build spec in `amplify.yml` for the Vite frontend. In the Amplify Console, connect the GitHub repository `smkk01/CrudApp` and the `main` branch. Set these build environment variables from the CDK outputs:
+
+- `VITE_API_BASE_URL` — the `ApiGatewayUrl` output
+- `VITE_AWS_REGION` — the stack region
+- `VITE_COGNITO_USER_POOL_ID` — the `UserPoolId` output
+- `VITE_COGNITO_USER_POOL_CLIENT_ID` — the `UserPoolClientId` output
+
+After Amplify assigns the branch domain, set `FRONTEND_ORIGIN` to `https://main.<app-id>.amplifyapp.com` and redeploy the CDK stack so API CORS matches the hosted frontend. Add an Amplify rewrite rule from `/<*>` to `/index.html` with status `200` for client-side routing.
+
 ## Notes
 
 - The backend uses an in-memory product repository by default for local development.

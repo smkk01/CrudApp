@@ -2,7 +2,9 @@
 
 ## Frontend hosting
 
-Use AWS Amplify or a static hosting service backed by CloudFront. For the default Vite configuration, the deployed frontend should point to the API Gateway URL exported by the CDK stack.
+AWS Amplify Hosting is configured through the repository's `amplify.yml` for the Vite frontend. Connect the GitHub `main` branch in Amplify Console, set the four `VITE_*` variables documented in the README, and configure an SPA rewrite to `/index.html`.
+
+After Amplify provides the branch domain, redeploy CDK with `FRONTEND_ORIGIN=https://main.<app-id>.amplifyapp.com` so API Gateway responses and preflight requests allow that exact origin.
 
 ## Backend hosting
 
