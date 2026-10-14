@@ -1,0 +1,43 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Install frontend dependencies
+        run: npm ci --prefix frontend
+
+      - name: Build frontend
+        run: npm run build --prefix frontend
+
+      - name: Publish backend
+        run: dotnet publish backend/CrudApi/CrudApi.csproj -c Release -o artifacts/CrudApi
+
+      - name: Install AWS CDK
+        run: npm install -g aws-cdk
+
+      - name: Deploy infrastructure
+        run: cdk deploy --app "dotnet run --project CrudAppCdk.csproj --configuration Release" --require-approval never
+        working-directory: infrastructure/CrudAppCdk
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ap-southeast-1
