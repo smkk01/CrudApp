@@ -1,6 +1,7 @@
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 using CrudApi.Models;
+using System.Globalization;
 
 namespace CrudApi.Services;
 
@@ -132,22 +133,22 @@ public class DynamoDbProductRepository : IProductRepository
         return response.Attributes.Count > 0;
     }
 
-    private static Product Map(Dictionary<string, AttributeValue> items)
+    internal static Product Map(Dictionary<string, AttributeValue> items)
     {
         return new Product
         {
             Id = GetString(items, "id"),
             Name = GetString(items, "name"),
             Description = GetString(items, "description"),
-            Price = decimal.Parse(GetString(items, "price")),
+            Price = decimal.Parse(GetString(items, "price"), CultureInfo.InvariantCulture),
             Category = GetString(items, "category"),
             IsActive = bool.Parse(GetString(items, "isActive")),
-            CreatedAt = DateTime.Parse(GetString(items, "createdAt")),
-            UpdatedAt = DateTime.Parse(GetString(items, "updatedAt"))
+            CreatedAt = DateTime.Parse(GetString(items, "createdAt"), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind),
+            UpdatedAt = DateTime.Parse(GetString(items, "updatedAt"), CultureInfo.InvariantCulture, DateTimeStyles.RoundtripKind)
         };
     }
 
-    private static Dictionary<string, AttributeValue> ToAttributes(Product product)
+    internal static Dictionary<string, AttributeValue> ToAttributes(Product product)
     {
         return new Dictionary<string, AttributeValue>
         {
