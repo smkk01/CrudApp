@@ -2,7 +2,7 @@
 
 ## Frontend hosting
 
-AWS Amplify Hosting is configured through the repository's `amplify.yml` for the Vite frontend. Connect the GitHub `main` branch in Amplify Console, set the four `VITE_*` variables documented in the README, and configure an SPA rewrite to `/index.html`.
+AWS Amplify Hosting is configured through the repository's `amplify.yml` for the Vite frontend. Connect the GitHub `main` branch in Amplify Console, set the four `VITE_*` variables documented in the README, and configure an SPA rewrite with source `</^[^.]+$/>`, target `/index.html`, and status `200`. This matches extensionless client-side routes while leaving static asset paths (which have file extensions) untouched; a catch-all `/<*>` rule rewrites JavaScript and CSS requests to HTML and prevents the app from loading.
 
 The `main` branch domain is `https://main.d31r4v0tw7ckk9.amplifyapp.com`. `FRONTEND_ORIGIN` is set to that origin by the deployment workflow; for manual deployment, set the same variable before running CDK. API Gateway's authorization and gateway error responses also include CORS headers so the browser can handle 401/403 errors.
 

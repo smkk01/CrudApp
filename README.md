@@ -81,7 +81,7 @@ The frontend is hosted by Amplify from the `main` branch of [`smkk01/CrudApp`](h
 - `VITE_COGNITO_USER_POOL_ID` — `ap-southeast-1_Wb9ZOX4bF`
 - `VITE_COGNITO_USER_POOL_CLIENT_ID` — `1steojb3dpo8lh6rri5bgod3o4`
 
-The Amplify SPA rewrite from `/<*>` to `/index.html` is configured. The CDK stack restricts API CORS to `https://main.d31r4v0tw7ckk9.amplifyapp.com`, including API Gateway authorization-error responses.
+The Amplify SPA rewrite `</^[^.]+$/>` to `/index.html` (status `200`) is configured. It serves extensionless app routes without rewriting static asset requests such as JavaScript, CSS, and SVG files. The CDK stack restricts API CORS to `https://main.d31r4v0tw7ckk9.amplifyapp.com`, including API Gateway authorization-error responses.
 
 ## Notes
 
